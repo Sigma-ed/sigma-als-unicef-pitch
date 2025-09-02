@@ -76,6 +76,6 @@ The simulation provided robust, preliminary validation of the Sigma-ALS concept.
 ## Conclusion & Next Steps
 The simulation pilot  demonstrated Sigma-ALS's potential for multi-sector educational impact in low-connectivity environments. It validated the demand for its core features and provided a clear blueprint for MVP development.
 
-**For UNICEF Evaluation:** This simulation pilot provides some evidence of the potential impact Sigma-ALS could have across diverse African educational contexts, but to demonstrate readiness for continent-wide scaling, an MVP will have to be tested to prove effectiveness, cultural appropriateness, and technical reliability: **building a technical MVP to validate scalability, economic viability, and long-term educational impact with a larger cohort.**
+**For UNICEF Evaluation:** This simulation pilot provides some evidence of the potential impact Sigma-ALS could have across diverse African educational contexts, but to demonstrate readiness for continent-wide scaling, an MVP will have to be tested to prove effectiveness, cultural appropriateness, and technical reliability: **building a technical MVP with a larger cohort is necessary to test and validate the long-term educational impact of Sigma- ALS .**
 
 **Contact:** Rita Ndagire Kizito | Sigma-Ed | kizitorita@gmail.com
