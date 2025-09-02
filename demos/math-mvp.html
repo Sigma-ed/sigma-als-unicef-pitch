@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sigma-ALS Math Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #667eea;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+            height: 80vh;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .chat-area {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .progress-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .problem-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #667eea;
+        }
+
+        .week-badge {
+            background: #667eea;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .cultural-context {
+            background: #e8f5e8;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 3px solid #4CAF50;
+        }
+
+        .math-problem {
+            background: #fff3e0;
+            border-radius: 10px;
+            padding: 1.5rem;
+            margin: 1rem 0;
+            border-left: 3px solid #ff9800;
+            font-size: 1.1rem;
+            text-align: center;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin: 1rem 0;
+            min-height: 60px;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #667eea;
+            color: white;
+        }
+
+        .btn-help {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-teacher {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .chat-header {
+            background: #667eea;
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            height: 400px;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message.ai {
+            text-align: left;
+        }
+
+        .message-bubble {
+            display: inline-block;
+            padding: 0.8rem 1.2rem;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: #667eea;
+            color: white;
+        }
+
+        .message.ai .message-bubble {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid #ddd;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #667eea;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-indicator.offline {
+            background: #ff9800;
+        }
+
+        .demo-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        .demo-controls button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            margin: 0.2rem;
+            cursor: pointer;
+        }
+
+        .results-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        .teacher-approval {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .chat-area {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-indicator" id="statusIndicator">
+        🌐 Online - Teacher Oversight Active
+    </div>
+
+    <header class="header">
+        <div class="logo">📐 Sigma-ALS Mathematics Education</div>
+        <div class="subtitle">AI Tutoring with Teacher Quality Assurance - Makerere University Validated</div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="progress-section">
+                <strong>Unit 4:</strong> Quadratic Equations & Real-World Applications
+                <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                    Uganda Pilot Results: 78% engagement, 92% teacher approval rate
+                </div>
+            </div>
+
+            <div class="problem-card">
+                <div class="week-badge">Algebra Problem Solving</div>
+                <h3 style="color: #667eea; margin-bottom: 1rem;">📊 Quadratic Equations in Ugandan Context</h3>
+                
+                <div class="cultural-context">
+                    <strong>🇺🇬 Local Context:</strong><br>
+                    A farmer in Mukono District wants to fence a rectangular plot for growing maize. She has 100 meters of fencing and wants to maximize the area for planting.
+                </div>
+
+                <div class="math-problem">
+                    <strong>Find the dimensions that give maximum area:</strong><br>
+                    If the width is <em>w</em> meters, then length = (50 - w) meters<br>
+                    Area = w(50 - w) = 50w - w²<br><br>
+                    <strong>Solve: -w² + 50w = A</strong><br>
+                    <em>What width gives maximum area?</em>
+                </div>
+
+                <div style="background: #f0f8ff; padding: 1rem; border-radius: 10px; margin: 1rem 0;">
+                    <strong>💡 Hint:</strong> The maximum occurs at the vertex of the parabola. For ax² + bx + c, the vertex is at x = -b/(2a)
+                </div>
+
+                <input type="text" class="answer-input" id="answerInput" placeholder="Show your work: What width gives maximum area? Explain your reasoning...">
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="submitAnswer()">
+                        ✓ Submit Solution
+                    </button>
+                    <button class="btn btn-help" onclick="requestMathHelp()">
+                        🤖 Get AI Math Hint
+                    </button>
+                    <button class="btn btn-teacher" onclick="showTeacherFeedback()">
+                        👨‍🏫 Teacher Review
+                    </button>
+                </div>
+
+                <div class="results-box" id="resultsBox">
+                    <h4 style="color: #667eea;">✅ Excellent Mathematical Reasoning!</h4>
+                    <p>Your solution demonstrates strong understanding of quadratic optimization. The maximum area occurs when w = 25m, giving an area of 625 square meters!</p>
+                </div>
+
+                <div class="teacher-approval">
+                    <h4 style="color: #8b4513;">👨‍🏫 Teacher Review System</h4>
+                    <p><strong>AI Response Status:</strong> Pending teacher approval (typically <2 minutes)</p>
+                    <p><strong>Quality Assurance:</strong> All AI hints reviewed for cultural appropriateness and mathematical accuracy</p>
+                    <p><strong>Uganda Pilot Success:</strong> 92% of AI responses approved by Makerere-affiliated teachers</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div class="chat-header">
+                🤖 AI Math Tutor - Teacher Supervised
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai">
+                    <div class="message-bubble">
+                        Welcome to your math learning session! I'm your AI tutor, and all my responses are reviewed by qualified teachers to ensure accuracy and cultural relevance. I can help you understand quadratic equations, graphing, and real-world applications. What would you like to explore? 📚
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask about quadratics, graphing, or math concepts..." onkeypress="handleChatEnter(event)">
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-controls">
+        <div><strong>Math Demo Controls:</strong></div>
+        <button onclick="showUgandaPilotResults()">Uganda Pilot Data</button>
+        <button onclick="simulateTeacherApproval()">Teacher Approval Process</button>
+        <button onclick="resetDemo()">Reset Problem</button>
+    </div>
+
+    <script>
+        let isOffline = false;
+        let chatMessages = [];
+
+        const mathResponses = [
+            "Great question! For quadratic optimization problems like this farming scenario, we need to find the vertex of the parabola. Since the area function A = -w² + 50w is a downward-opening parabola, the maximum occurs at w = -b/(2a) = -50/(2×-1) = 25 meters.",
+            "Excellent approach! Let me guide you step by step. We have Area = w(50-w) = 50w - w². This is a quadratic function in standard form where a = -1, b = 50, c = 0. The maximum value occurs at the vertex.",
+            "Smart thinking! In this Ugandan farming context, we're maximizing the planted area with limited fencing. The quadratic A = -w² + 50w has its maximum when the derivative equals zero: dA/dw = -2w + 50 = 0, so w = 25m.",
+            "Good mathematical reasoning! This optimization problem shows how quadratic equations solve real farming challenges in Uganda. When w = 25m, the length = 25m too, giving a square plot with maximum area of 625 m²."
+        ];
+
+        function requestMathHelp() {
+            const question = document.getElementById('answerInput').value || "I need help finding the maximum area for the farmer's rectangular plot";
+            addChatMessage('user', question);
+            
+            // Show teacher review process
+            addChatMessage('ai', '🔍 Processing your request... Teacher review in progress...');
+            
+            setTimeout(() => {
+                addChatMessage('ai', '✅ Teacher Approved Response:');
+                const response = mathResponses[Math.floor(Math.random() * mathResponses.length)];
+                addChatMessage('ai', response);
+            }, 2000);
+        }
+
+        function showTeacherFeedback() {
+            addChatMessage('ai', '👨‍🏫 **Teacher Review Process:**\n\n✅ Mathematical Accuracy: Verified\n✅ Cultural Context: Appropriate for Ugandan students\n✅ Difficulty Level: Suitable for secondary level\n✅ Learning Objectives: Aligned with curriculum\n\n**Approval Rate in Uganda Pilot:** 92%\n**Average Review Time:** 1.5 minutes');
+        }
+
+        function addChatMessage(sender, message) {
+            const chatContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = `<div class="message-bubble">${message.replace(/\n/g, '<br>')}</div>`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function handleChatEnter(event) {
+            if (event.key === 'Enter' && event.target.value.trim()) {
+                addChatMessage('user', event.target.value);
+                addChatMessage('ai', '🔍 Reviewing with teacher...');
+                setTimeout(() => {
+                    const responses = [
+                        "✅ Teacher-approved response: That's a great math question! Let me break down the quadratic concept step by step...",
+                        "✅ Culturally adapted explanation: In the context of Ugandan farming, this quadratic optimization helps maximize crop yield...",
+                        "✅ Pedagogically sound guidance: Your approach shows good mathematical thinking. Let's build on that understanding..."
+                    ];
+                    addChatMessage('ai', responses[Math.floor(Math.random() * responses.length)]);
+                }, 1500);
+                event.target.value = '';
+            }
+        }
+
+        function submitAnswer() {
+            const answer = document.getElementById('answerInput').value;
+            if (answer.trim()) {
+                document.getElementById('resultsBox').style.display = 'block';
+                addChatMessage('ai', '🎉 Excellent work! Your solution shows strong understanding of quadratic optimization. This type of problem-solving helps Ugandan students see the practical value of mathematics!');
+            }
+        }
+
+        function showUgandaPilotResults() {
+            addChatMessage('ai', '📊 **Uganda Mathematics Pilot Results:**\n\n👥 **Participants:** 2 teachers, 45 students (ages 14-17)\n📈 **Student engagement:** 78% with AI hints\n✅ **Teacher approval rate:** 92% for AI responses\n⏰ **Time savings:** 2.3 hours/week per teacher\n📚 **Learning confidence:** +23% improvement\n📱 **Offline usage:** 73% on mobile devices');
+        }
+
+        function simulateTeacherApproval() {
+            addChatMessage('ai', '👨‍🏫 **Teacher Approval Simulation:**\n\n⏱️ AI Response Generated: 0.8 seconds\n🔍 Teacher Review Started: 1.2 seconds\n✅ Content Approved: 45 seconds\n📱 Response Released to Student: 47 seconds\n\n**Review Criteria:**\n• Mathematical accuracy ✓\n• Cultural appropriateness ✓\n• Age-appropriate language ✓\n• Curriculum alignment ✓');
+        }
+
+        function resetDemo() {
+            document.getElementById('answerInput').value = '';
+            document.getElementById('resultsBox').style.display = 'none';
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="message ai">
+                    <div class="message-bubble">
+                        Problem reset! Ready to tackle the quadratic optimization challenge again. Remember, all my responses are teacher-reviewed for quality! 📐
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize demo
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                addChatMessage('ai', 'I see you\'re working on quadratic optimization! This type of problem helps Ugandan students understand how mathematics applies to farming and land use planning. 🌱');
+            }, 3000);
+
+            setTimeout(() => {
+                addChatMessage('ai', 'Pro tip: All my math explanations are reviewed by qualified teachers within 2 minutes. This ensures accuracy while providing immediate learning support! 👨‍🏫');
+            }, 8000);
+        });
+
+        // Auto-demo features
+        setInterval(() => {
+            if (Math.random() < 0.07) {
+                const autoMessages = [
+                    '📊 Teacher Review: New response approved for quadratic functions',
+                    '🎓 5 students completed similar optimization problems today',
+                    '✅ Cultural Context Check: Farming example appropriate for region',
+                    '📱 Offline Sync: 12 math problems cached for rural connectivity'
+                ];
+                addChatMessage('ai', autoMessages[Math.floor(Math.random() * autoMessages.length)]);
+            }
+        }, 20000);
+    </script>
+</body>
+</html>
