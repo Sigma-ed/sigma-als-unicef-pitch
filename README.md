@@ -17,7 +17,7 @@ Welcome! This repository is your gateway to evaluating the Sigma-ALS project. Be
 
 ### 2. 📊 Review the Evidence
 Our solution is proven with real-world results from two African countries:
-*   **👉 [Read the Pilot Results Summary](2-Pilot-Results.md)**
+*   **👉 [Read the Pilot Results Summary](2-Simulated-Pilot-Results.md)**
     *   **Uganda (Mathematics):** 78% increase in engagement, 2.3h/week teacher time saved.
     *   **Uganda (Agriculture):** students spent time on learning tasks even in online environments. 
     *   **South Africa (TVET):** improved lesson planning efficiency by about 40%.
@@ -41,9 +41,9 @@ Our clear plan for deployment and sustainable growth across Africa:
 
 ## 🔗 Comprehensive Technical Repositories
 For a technical dive, our complete open-source codebase is available:
-*   **Backend API & AI Core:** [sigma-als-core](https://github.com/YourOrg/sigma-als-core)
-*   **Frontend Web Application:** [sigma-als-frontend](https://github.com/YourOrg/sigma-als-frontend)
-*   **Full Documentation Suite:** [sigma-als-docs](https://github.com/YourOrg/sigma-als-docs)
+*   **Backend API & AI Core:** [sigma-als-core](https://github.com/Sigma-ed/sigma-als-core)
+*   **Frontend Web Application:** [sigma-als-frontend](https://github.com/Sigma-ed/sigma-als-frontend)
+*   **Full Documentation Suite:** [sigma-als-docs](https://github.com/Sigma-ed/sigma-als-docs)
 
 ---
 
