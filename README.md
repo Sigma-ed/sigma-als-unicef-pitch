@@ -35,7 +35,7 @@ Our clear plan for deployment and sustainable growth across Africa:
 
 ## 📄 Full Application Documentation
 *   **Project Summary:** [`1-Project-Summary.md`](1-Project-Summary.md)
-*   **Complete UNICEF Application:** [`5-UnICEF-Application-Summary.md`](5-UnICEF-Application-Summary.md)
+*   **Complete UNICEF Application:** [`5-UnICEF-Application-Summary.md`](5-UNICEF-Application-Summary.md)
 
 ---
 
