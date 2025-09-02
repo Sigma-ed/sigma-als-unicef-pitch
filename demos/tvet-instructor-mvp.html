@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sigma-ALS TVET Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #3F51B5 0%, #2196F3 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .header {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 1rem 2rem;
+            box-shadow: 0 2px 20px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-size: 1.8rem;
+            font-weight: bold;
+            color: #3F51B5;
+            text-align: center;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-top: 0.5rem;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            display: grid;
+            grid-template-columns: 1fr 350px;
+            gap: 2rem;
+            height: 80vh;
+        }
+
+        .main-content {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .chat-area {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .progress-section {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #3F51B5;
+        }
+
+        .scenario-card {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 2rem;
+            margin-bottom: 1.5rem;
+            border-left: 4px solid #3F51B5;
+        }
+
+        .week-badge {
+            background: #3F51B5;
+            color: white;
+            padding: 0.3rem 0.8rem;
+            border-radius: 12px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            display: inline-block;
+        }
+
+        .instructor-context {
+            background: #f3e5f5;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 3px solid #9c27b0;
+        }
+
+        .success-story {
+            background: #e3f2fd;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 3px solid #2196F3;
+        }
+
+        .tools-list {
+            background: #fff3e0;
+            border-radius: 10px;
+            padding: 1rem;
+            margin: 1rem 0;
+            border-left: 3px solid #ff9800;
+        }
+
+        .answer-input {
+            width: 100%;
+            padding: 1rem;
+            border: 2px solid #ddd;
+            border-radius: 10px;
+            font-size: 1rem;
+            margin: 1rem 0;
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .answer-input:focus {
+            outline: none;
+            border-color: #3F51B5;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .btn {
+            padding: 0.8rem 1.5rem;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: #3F51B5;
+            color: white;
+        }
+
+        .btn-help {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-tools {
+            background: #9c27b0;
+            color: white;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .chat-header {
+            background: #3F51B5;
+            color: white;
+            padding: 1rem;
+            font-weight: 600;
+            border-radius: 20px 20px 0 0;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 1rem;
+            overflow-y: auto;
+            height: 400px;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(20px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+
+        .message.user {
+            text-align: right;
+        }
+
+        .message.ai {
+            text-align: left;
+        }
+
+        .message-bubble {
+            display: inline-block;
+            padding: 0.8rem 1.2rem;
+            border-radius: 15px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .message.user .message-bubble {
+            background: #3F51B5;
+            color: white;
+        }
+
+        .message.ai .message-bubble {
+            background: #e9ecef;
+            color: #333;
+        }
+
+        .chat-input-area {
+            padding: 1rem;
+            border-top: 1px solid #ddd;
+            border-radius: 0 0 20px 20px;
+        }
+
+        .chat-input {
+            width: 100%;
+            padding: 0.8rem;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            font-size: 0.9rem;
+        }
+
+        .status-indicator {
+            position: fixed;
+            top: 80px;
+            right: 20px;
+            background: #3F51B5;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .status-indicator.offline {
+            background: #ff9800;
+        }
+
+        .demo-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.8);
+            color: white;
+            padding: 1rem;
+            border-radius: 10px;
+            font-size: 0.8rem;
+        }
+
+        .demo-controls button {
+            background: #3F51B5;
+            color: white;
+            border: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            margin: 0.2rem;
+            cursor: pointer;
+        }
+
+        .results-box {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 10px;
+            padding: 1rem;
+            margin-top: 1rem;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+                height: auto;
+            }
+            
+            .chat-area {
+                height: 400px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="status-indicator" id="statusIndicator">
+        🌐 Online - TVET Resources Active
+    </div>
+
+    <header class="header">
+        <div class="logo">🎓 Sigma-ALS TVET Instructor Development</div>
+        <div class="subtitle">Digital-First Vocational Education - South Africa DHET Validated</div>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="progress-section">
+                <strong>Week 3 of 6:</strong> AI Tools for Educators
+                <div style="margin-top: 0.5rem; font-size: 0.9rem; color: #666;">
+                    SA Pilot Results: 65% time savings, 87% content approval rate
+                </div>
+            </div>
+
+            <div class="scenario-card">
+                <div class="week-badge">AI-Powered Lesson Planning</div>
+                <h3 style="color: #3F51B5; margin-bottom: 1rem;">🤖 Transform Your Teaching with AI</h3>
+                
+                <div class="instructor-context">
+                    <strong>👨‍🏫 Your Teaching Context:</strong><br>
+                    You're a vocational instructor at a technical college in Cape Town, teaching automotive repair to 25 students. You need to create a 5-day curriculum on "Electric Vehicle Maintenance" but have limited time and outdated resources.
+                </div>
+
+                <div class="success-story">
+                    <strong>🌟 Real Success Story:</strong><br>
+                    Thabo Mthembu, TVET instructor in Johannesburg, used AI tools to reduce lesson planning from 6 hours to 2 hours per week. His students' industry placement rate increased from 45% to 78% using AI-generated, locally relevant case studies.
+                </div>
+
+                <div class="tools-list">
+                    <strong>🛠️ Free AI Tools Available:</strong>
+                    <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+                        <li><strong>ChatGPT:</strong> Lesson planning & content creation</li>
+                        <li><strong>Gemini:</strong> Industry research & local case studies</li>
+                        <li><strong>Claude:</strong> Assessment design & rubrics</li>
+                    </ul>
+                </div>
+
+                <p><strong>Your Challenge:</strong> Design Day 1 of your EV maintenance curriculum using AI assistance. Include learning objectives, practical activities, and assessment methods.</p>
+
+                <textarea class="answer-input" id="answerInput" placeholder="Design your AI-assisted lesson plan:
+
+1. AI Prompts you would use:
+   - Example: 'Create learning objectives for EV maintenance suitable for Level 3 automotive students in South Africa'
+
+2. Local Context Adaptation:
+   - How will you adapt AI content for South African automotive industry?
+   - What local vehicle models and market conditions will you include?
+
+3. Practical Activities:
+   - What hands-on exercises can you design with <R500 budget?
+   - How will you simulate EV systems without expensive equipment?
+
+4. Assessment Strategy:
+   - How will you measure student competency?
+   - What industry standards will you align with?
+
+Explain your complete approach..."></textarea>
+
+                <div class="action-buttons">
+                    <button class="btn btn-primary" onclick="submitLessonPlan()">
+                        📚 Submit Lesson Plan
+                    </button>
+                    <button class="btn btn-help" onclick="requestTVETCoaching()">
+                        🧠 Get AI TVET Coach
+                    </button>
+                    <button class="btn btn-tools" onclick="showAITools()">
+                        🛠️ View AI Tools Guide
+                    </button>
+                </div>
+
+                <div class="results-box" id="resultsBox">
+                    <h4 style="color: #3F51B5;">✅ Excellent AI Integration!</h4>
+                    <p>Your lesson plan shows sophisticated understanding of AI-assisted TVET instruction. This approach can transform technical education across Africa!</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="chat-area">
+            <div class="chat-header">
+                🧠 AI TVET Instructor Coach - DHET Validated
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="message ai">
+                    <div class="message-bubble">
+                        Welcome to your TVET professional development session! I'm your AI instructor coach, specialized in vocational education and AI integration. I can help you design curricula, create assessments, and integrate industry-relevant content. What teaching challenge can I help solve? 🛠️
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <input type="text" class="chat-input" id="chatInput" placeholder="Ask about AI prompts, lesson planning, or TVET pedagogy..." onkeypress="handleChatEnter(event)">
+            </div>
+        </div>
+    </div>
+
+    <div class="demo-controls">
+        <div><strong>TVET Demo Controls:</strong></div>
+        <button onclick="showSAPilotResults()">SA DHET Pilot Results</button>
+        <button onclick="simulateAILessonPlan()">Generate AI Lesson Plan</button>
+        <button onclick="resetDemo()">Reset Demo</button>
+    </div>
+
+    <script>
+        let isOffline = false;
+        let chatMessages = [];
+
+        const tvetResponses = [
+            "Excellent TVET pedagogy question! For AI-assisted lesson planning, start with specific prompts like 'Design practical automotive exercises for South African technical students with limited equipment budget.' This localization is key to effective instruction.",
+            "Smart approach! The most successful TVET instructors in our pilot combined AI efficiency with local industry knowledge. Try: 'Create EV maintenance scenarios using vehicle models popular in South African market - Toyota Corolla Cross, Hyundai Kona Electric.'",
+            "Great teaching strategy! AI can generate industry-aligned content quickly, but you add the crucial local context. For automotive TVET: include local regulations, available parts suppliers, and regional job market requirements in your prompts.",
+            "Perfect integration thinking! Our South Africa pilot showed 87% content approval when instructors used AI + local expertise. The key is prompting AI with specific technical requirements, budget constraints, and industry standards."
+        ];
+
+        function requestTVETCoaching() {
+            const question = document.getElementById('answerInput').value || "I need help with AI-powered lesson planning for my TVET course";
+            addChatMessage('user', question);
+            
+            setTimeout(() => {
+                const response = tvetResponses[Math.floor(Math.random() * tvetResponses.length)];
+                addChatMessage('ai', response);
+            }, 1500);
+        }
+
+        function showAITools() {
+            addChatMessage('ai', '🛠️ AI Tools for TVET Instructors:\n\n🤖 **ChatGPT**: "Design hands-on automotive exercise for EV battery diagnostics suitable for technical college students with R500 budget"\n\n📚 **Gemini**: "Research South African automotive industry trends and job market requirements for EV technicians"\n\n📝 **Claude**: "Create assessment rubric for practical EV maintenance skills aligned with QCTO unit standards"\n\nPro tip: Always specify local context, budget constraints, and industry standards!');
+        }
+
+        function addChatMessage(sender, message) {
+            const chatContainer = document.getElementById('chatMessages');
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${sender}`;
+            messageDiv.innerHTML = `<div class="message-bubble">${message.replace(/\n/g, '<br>')}</div>`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        function handleChatEnter(event) {
+            if (event.key === 'Enter' && event.target.value.trim()) {
+                addChatMessage('user', event.target.value);
+                setTimeout(() => {
+                    const responses = [
+                        "That's an excellent TVET pedagogy question! Based on our South African pilot experience, here's the most effective approach...",
+                        "Smart teaching challenge! Let me share how other technical instructors have successfully integrated AI tools...",
+                        "Great question about digital-first TVET education! Here's a proven strategy from our DHET validation..."
+                    ];
+                    addChatMessage('ai', responses[Math.floor(Math.random() * responses.length)]);
+                }, 1000);
+                event.target.value = '';
+            }
+        }
+
+        function submitLessonPlan() {
+            const answer = document.getElementById('answerInput').value;
+            if (answer.trim()) {
+                document.getElementById('resultsBox').style.display = 'block';
+                addChatMessage('ai', 'Outstanding lesson plan design! Your AI integration strategy shows exactly how technology can enhance TVET instruction while maintaining practical, industry-relevant focus. This is the future of technical education!');
+            }
+        }
+
+        function showSAPilotResults() {
+            addChatMessage('ai', '📊 South Africa DHET Pilot Results:\n• 1 supervisor, 3 instructors participated\n• 65% reduction in lesson planning time\n• 87% approval rate for AI-generated content\n• 4/4 successful industry curriculum alignments\n• Student engagement improved 34%\n• Weekly time savings: 4.1 hours per instructor');
+        }
+
+        function simulateAILessonPlan() {
+            addChatMessage('ai', '🤖 AI-Generated Lesson Plan Sample:\n\n**Day 1: EV Battery Systems**\n• Learning Objective: Students identify EV battery components and safety procedures\n• Practical Activity: Battery voltage testing using multimeters (R150 budget)\n• Local Context: Focus on Nissan Leaf and BMW i3 models available in SA\n• Assessment: Practical skills checklist aligned with QCTO standards\n\nTime saved: 4 hours → 1 hour planning!');
+        }
+
+        function resetDemo() {
+            document.getElementById('answerInput').value = '';
+            document.getElementById('resultsBox').style.display = 'none';
+            document.getElementById('chatMessages').innerHTML = `
+                <div class="message ai">
+                    <div class="message-bubble">
+                        Demo reset! Ready to explore AI-powered TVET instruction again. What teaching challenge would you like to tackle? 🎓
+                    </div>
+                </div>
+            `;
+        }
+
+        // Initialize demo
+        document.addEventListener('DOMContentLoaded', function() {
+            setTimeout(() => {
+                addChatMessage('ai', 'I see you\'re designing AI-assisted lesson plans! This approach reduced planning time by 65% in our South African pilot. The key is combining AI efficiency with your local industry expertise. 🚀');
+            }, 3000);
+
+            setTimeout(() => {
+                addChatMessage('ai', 'Pro tip: The most successful TVET instructors use AI for initial content generation, then adapt for local industry requirements. This hybrid approach achieves 87% approval rates! 💡');
+            }, 8000);
+        });
+
+        // Auto-demo features
+        setInterval(() => {
+            if (Math.random() < 0.08) {
+                const autoMessages = [
+                    '📈 Industry Update: EV technician jobs in SA increased 45% this year',
+                    '🎓 3 instructors completed similar lesson plans this week',
+                    '💼 New partnership: Technical college + Toyota SA for EV training',
+                    '🛠️ Tip: Always include local QCTO standards in AI prompts'
+                ];
+                addChatMessage('ai', autoMessages[Math.floor(Math.random() * autoMessages.length)]);
+            }
+        }, 18000);
+    </script>
+</body>
+</html>
